@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#!/bin/bash
+
 	#######################################################################################################
 	#                                                                                                     #
 	#          SCRIPT PARA AGILIZAR PROCESSOS DE ATUALIZAÇÕES E INSTALAÇÕES NO DEBIAN 8 JESSIE            #
@@ -52,8 +54,6 @@ LOGFILE="/var/log/${0##*/}".log
 exec 1> >(tee -a "$LOGFILE")
 # faz o mesmo para a saída de ERROS
 exec 2>&1
-
-
 
 #Check if its root
 CheckisROOT(){
@@ -189,6 +189,7 @@ Begin(){
 	fi #scriptopen
 }
 
+#Menu Install Programs
 InstallingPrograms(){
 
  Option=$( dialog --backtitle 'Programs for Debian | Viva o Linux' --stdout --menu 'MENU PRINCIPAL:' \
@@ -208,6 +209,7 @@ InstallingPrograms(){
 		esac
 }
 
+#Packet of DevOps
 ProgramsDevops(){
 
 	  Option=$(dialog --backtitle 'Viva o Linux | Programs for Debian' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
@@ -219,8 +221,8 @@ ProgramsDevops(){
 
 	#To convert lowercase to uppercase
 	OptionDev=$(echo "$Option" | tr 'A-Z' 'a-z')
-	
-	
+
+
 	#Sublime-Text Installation
 	if echo "$OptionDev" | egrep 'sublime-text' > /dev/null ; then
 
@@ -272,15 +274,15 @@ ProgramsDevops(){
 		InstallingPrograms
 
 	else
-	
+
 		#Installation of the chosen packages
 		debconf-apt-progress -- apt-get install $OptionDev -y
-		
+
 		InstallingPrograms
-		
+
 	fi
 
-	
+
 
 }
 
