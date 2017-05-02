@@ -437,7 +437,7 @@ Plugins(){
 }
 
 #Packet of Desing Application
-ProgramsDesing(){
+ProgramsDesign(){
 
 Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
 		Blender	'Modelador 3D' 	            on\
@@ -451,17 +451,25 @@ Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolh
 	
 	fi
 
+	
 	#To convert lowercase to uppercase
 	OptionDesing=$(echo "$Option" | tr 'A-Z' 'a-z')
 	
 	
-	if [[ -z $OptionPlugin ]]; then
+	if [[ -z $OptionDesing ]]; then
 
 		InstallingPrograms	
 
 	else
 	
-		debconf-apt-progress -- apt-get install $OptionDesign -y
+		
+		
+		#Installation of the chosen packages
+		debconf-apt-progress -- apt-get install $OptionDesing -y
+
+		dialog --backtitle 'Instalacao de pacotes'\
+			   --title "AVISO"\
+			   --msgbox "Os pacotes: $OptionDesing foram instalados!"  10 30 \
 		
 		
 		
