@@ -315,7 +315,7 @@ ProgramsDevops(){
 				 clear
 				 debconf-apt-progress -- apt-get install git -y
 				 dpkg -i deb				  
-				 apt-get install -f 
+				 apt-get install -f -y
 				
 			fi
 		fi
@@ -362,7 +362,7 @@ ProgramsDevops(){
 						 #Installation packege
 						 clear
 						 dpkg -i sublime-text_build-3126_i386.deb
-						 apt-get install -f
+						 apt-get install -f -y
 					fi
 											
 				fi
@@ -606,7 +606,7 @@ ProgramsInternet(){
 				debconf-apt-progress -- apt-get update
 				
 				dpkg -i teamviewer_i386.deb
-				apt-get install -f
+				apt-get install -f -y
 			
 			fi
 		fi
