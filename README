@@ -1,0 +1,75 @@
+================================
+ PROGRAMS FOR DEBIAN 8 V1.0 (EN)
+================================
+
+About Script:
+
+  This script has the idea to help users both beginners and smart users. Its operation is simple and intuitive. 
+Using only bash and the graphical interface add-on "dialog".
+
+Please send me feedback for improvements and corrections of minor errors that have gone unnoticed.
+Thank you all!
+
+Acess to: www.vivaolinux.com.br
+
+Be Free Use Linux!
+
+
+HOW TO USE?
+
+1 - Download: https://codeload.github.com/KelvinFerraz/ProgramsforDebian/zip/master
+
+2 - Extrat to file: 
+	$unzip ProgramsforDebian-master.zip
+
+3 - Enter in directory ProgramsforDebian-master: 
+	$cd ProgramsforDebian-master
+
+4 - Permission on file using a root: "ProgramsDebianJessie.sh" : 
+	#chmod +x ProgramsDebianJessie.sh
+
+5 - This Script run just to root: 
+	#./ProgramsDebianJessie.sh
+
+
+Contact: e-mail: kelvinferrazsilva@gmail.com
+Instagram: https://www.instagram.com/kelvinferraz/ Follow me! :D 
+Acess to: www.vivaolinux.com.br
+
+
+===================================
+ PROGRAMS FOR DEBIAN 8 V1.0 (PT-BR)
+===================================
+
+Sobre o Script:
+
+Este script tem a idéia de ajudar os usuários novatos e usuários inteligentes. Sua operação é simples e intuitiva. 
+Usando apenas script em  bash e a interface gráfica add-on "diálogo".
+
+Envie-me comentários para melhorias e correções de pequenos erros que passaram despercebidos.
+Obrigado a todos!
+
+Seja Livre use Linux!
+
+
+COMO USAR?
+
+1 - Faça Download aqui: https://codeload.github.com/KelvinFerraz/ProgramsforDebian/zip/master
+
+2 - Extraia o arquivo: 
+	$unzip ProgramsforDebian-master.zip
+
+3 - Entre no diretório ProgramsforDebian-master: 
+	$cd ProgramsforDebian-master
+
+4 - De permissão de execução utilizando o root no arquivo: "ProgramsDebianJessie.sh" : 
+	#chmod +x ProgramsDebianJessie.sh
+
+5 - Execute com root o arquivo ProgramsDebianJessie.sh: 
+	#./ProgramsDebianJessie.sh
+
+
+
+Contatos: e-mail: kelvinferrazsilva@gmail.com
+Instagram: https://www.instagram.com/kelvinferraz/ Me siga! :D
+Acesse: www.vivaolinux.com.br
