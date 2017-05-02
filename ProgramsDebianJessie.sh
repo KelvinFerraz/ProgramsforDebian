@@ -469,6 +469,7 @@ ProgramsDesign(){
 			   --title "AVISO"\
 			   --msgbox "Os pacotes: $OptionDesing foram instalados!"  10 30 \
 		
+		InstallingPrograms
 	fi
 }
 
