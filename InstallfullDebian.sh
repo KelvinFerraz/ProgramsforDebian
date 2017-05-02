@@ -42,7 +42,7 @@
 	#   																								  #
 	#######################################################################################################
 
-
+clear
 
 #Full-Screen Option
 StartFullScreen(){
@@ -228,26 +228,26 @@ Begin(){
 
 		fi
 
-	fi #scriptopen
+	fi
 }
 
 #Menu Install Programs
 InstallingPrograms(){
 
  Option=$( dialog --backtitle 'Programs for Debian | Viva o Linux' --stdout --menu 'MENU PRINCIPAL:' \
-		0 0 0                  \
-		1 'Programas DevOps'   \
-		2 'Plug-ins'           \
-		3 'Programas Design'   \
-		4 'Audio e video'      \
-		5 'Programas Internet' \
+		0 0 0                       \
+		1 'Programas DevOps'        \
+		2 'Plug-ins'                \
+		3 'Programas Design'        \
+		4 'Players (Audio e Video)' \
+		5 'Programas Internet'      \
 		6 'Sair')
 
 		case $Option in
 			1) ProgramsDevops ;;
 			2) Plugins ;;
 			3) ProgramsDesign ;;
-			4) Backup ;;
+			4) ProgramsPlayers ;;
 			5) ProgramsInternet ;;
 			6) exit ;;
 		esac
@@ -439,7 +439,7 @@ Plugins(){
 #Packet of Desing Application
 ProgramsDesign(){
 
-Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
+	Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
 		Blender	'Modelador 3D' 	            on\
 		Gimp    'Editor de Imagem'         off\
 		Inkscape 'Vetorização de Imagem'   off)
@@ -461,9 +461,7 @@ Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolh
 		InstallingPrograms	
 
 	else
-	
-		
-		
+					
 		#Installation of the chosen packages
 		debconf-apt-progress -- apt-get install $OptionDesing -y
 
@@ -471,12 +469,223 @@ Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolh
 			   --title "AVISO"\
 			   --msgbox "Os pacotes: $OptionDesing foram instalados!"  10 30 \
 		
-		
-		
 	fi
+}
+
+#Packet of Players
+ProgramsPlayers(){
+
+	Option=$(dialog --backtitle 'Viva o Linux | Players Audio e Video' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
+		Amarok      'Player de Video base em KDE'                 on\
+		Audacious	'Player de Audio interface do Winamp'        off\
+		Clementine  'PLayer de Audio Completo'                   off\
+		Kodi        'Media Center e Player de Audio/Video'       off\
+		Qmmp        'Player de Audio interface do Winamp'        off\
+		Smplayer    'Player de Video'                            off\
+		Spotfy      'Player de Audio Biblioteca Online'          off\
+		Vlc         'Player de Vídeos com Recurso de Gravação'   off)
+		
+	#case cancel button is selected back to Programs Menu
+	if [ $? -eq 1 ]; then
+	
+		InstallingPrograms
+	
+	fi
+
+	
+	#To convert lowercase to uppercase
+	OptionPlayers=$(echo "$Option" | tr 'A-Z' 'a-z')
+	
+	
+	if [[ -z $OptionPlayers ]]; then
+
+		InstallingPrograms	
+
+	else
+	
+		#Instalation Spotfy
+		if echo "$OptionPlayers" | egrep 'spotfy' > /dev/null ; then
+	
+			sleep 0.1
+
+		else
+
+			# 1. Add the Spotify repository signing key to be able to verify downloaded packages
+			sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886
+
+			# 2. Add the Spotify repository
+			echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+
+			# 3. Update list of available packages
+			debconf-apt-progress -- apt-get update
+
+			# 4. Install Spotify
+			debconf-apt-progress -- apt-get install spotify-client -y
+			
+		fi
+	
+	
+	
+		#Installation of the chosen packages
+		debconf-apt-progress -- apt-get install $OptionPlayers -y
+
+		dialog --backtitle 'Instalacao de pacotes'\
+			   --title "AVISO"\
+			   --msgbox "Os pacotes: $OptionPlayers foram instalados!"  10 30 \
+	
+	
+	fi
+		
 
 
 }
 
+#Packet of Internet
+ProgramsInternet(){
 
+
+	Option=$(dialog --backtitle 'Viva o Linux | Players Audio e Video' --stdout --checklist 'Escolha seu Programa:' 0 0 0 \
+		Qbittorrent 'Gerenciador Torrent'   	    on\
+		Skype       'Chat de Mensagem Voz e Video' off\
+		TeamViwer   'Acesso remoto'                off)
+		
+	##case cancel button is selected back to Programs Menu
+	if [ $? -eq 1 ]; then
+	
+		InstallingPrograms
+	
+	fi
+	
+	#To convert lowercase to uppercase
+	OptionInternet=$(echo "$Option" | tr 'A-Z' 'a-z')
+	
+	
+	if [[ -z $OptionInternet ]]; then
+
+		InstallingPrograms	
+
+	else
+	
+	
+		#Instalation Spotfy
+		if echo "$OptionInternet" | egrep 'skype' > /dev/null ; then
+	
+			sleep 0.1
+
+		else
+			
+			arq=$( file /bin/bash | cut -d' ' -f3 )
+
+			#condiction 32 or 64 bit
+			if [ $arq = '64-bit' ]; then
+			
+				cd /tmp/
+				rm -rf /tmp/*.deb
+				rm -rf /tmp/*.deb.*
+				
+				
+				Skype="https://repo.skype.com/latest/skypeforlinux-64.deb"
+				wget "$Skype" 2>&1 | \
+				stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+				dialog --backtitle 'Skype' --gauge "Download Skype" 0 50
+		
+				dpkg --add-architecture i386			
+				debconf-apt-progress -- apt-get update
+				
+				gpg --keyserver pgpkeys.mit.edu --recv-key 1F3045A5DF7587C3
+				gpg -a --export 1F3045A5DF7587C3 | sudo apt-key add -
+				debconf-apt-progress -- apt-get update		
+				
+				dpkg -i skypeforlinux-64.deb				
+				apt-get	install -f -y
+				
+			elif [ $arq = '32-bit' ]; then
+			
+				cd /tmp/
+				rm -rf /tmp/*.deb
+				rm -rf /tmp/*.deb.*
+				
+				
+				Skype="wget skype-install.deb http://www.skype.com/go/getskype-linux-deb"
+				wget "$Skype" 2>&1 | \
+				stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+				dialog --backtitle 'Skype' --gauge "Download Skype" 0 50
+			
+				dpkg --add-architecture i386			
+				debconf-apt-progress -- apt-get update
+				
+				gpg --keyserver pgpkeys.mit.edu --recv-key 1F3045A5DF7587C3
+				gpg -a --export 1F3045A5DF7587C3 | sudo apt-key add -
+				debconf-apt-progress -- apt-get update		
+				
+				dpkg -i getskype-linux-deb			
+				apt-get	install -f -y
+			
+			fi
+
+		fi
+		
+		#Instalation Team Viwer
+		if echo "$OptionInternet" | egrep 'teamviwer' > /dev/null ; then
+	
+			sleep 0.1
+
+		else
+
+			arq=$( file /bin/bash | cut -d' ' -f3 )
+			
+			if [ $arq = '64-bit' ]; then
+					
+					cd /tmp/
+					rm -rf /tmp/*.deb
+					rm -rf /tmp/*.deb.*
+				
+					
+					TeamViwer="https://download.teamviewer.com/download/version_11x/teamviewer_amd64.deb"
+					wget "$TeamViwer" 2>&1 | \
+					stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+					dialog --backtitle 'TeamViwer' --gauge "Download Team Viwer" 0 50
+					
+					debconf-apt-progress -- apt-get update		
+				
+					dpkg -i teamviewer_amd64.deb			
+					apt-get	install -f -y
+				
+			elif [ $arq = '32-bit' ]; then
+		
+					cd /tmp/
+					rm -rf /tmp/*.deb
+					rm -rf /tmp/*.deb.*
+				
+					
+					TeamViwer="http://download.teamviewer.com/download/version_11x/teamviewer_i386.deb"
+					wget "$TeamViwer" 2>&1 | \
+					stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+					dialog --backtitle 'TeamViwer' --gauge "Download Team Viwer" 0 50
+					
+					debconf-apt-progress -- apt-get update		
+				
+					dpkg -i teamviewer_i386.deb			
+					apt-get	install -f -y
+		
+		
+			fi
+
+		fi
+
+		
+		#Installation of the chosen packages
+		debconf-apt-progress -- apt-get install $OptionInternet -y
+
+		dialog --backtitle 'Instalacao de pacotes'\
+			   --title "AVISO"\
+			   --msgbox "Os pacotes: $OptionInternet  foram instalados!"  10 30 \
+
+		InstallingPrograms
+
+	
+	fi
+
+
+}
 StartFullScreen
