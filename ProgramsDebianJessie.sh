@@ -542,7 +542,8 @@ ProgramsPlayers(){
 
 		dialog --backtitle 'Instalacao de pacotes'\
 			   --title "AVISO"\
-			   --msgbox "Os pacotes: $OptionPlayers foram instalados!"  10 30 \
+			   --msgbox "Os pacotes: $OptionPlayers foram instalados!" 10 30 \
+		
 		InstallingPrograms
 	
 	fi
