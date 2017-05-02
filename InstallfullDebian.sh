@@ -1,12 +1,11 @@
 #!/bin/bash
 
-
 	#######################################################################################################
 	#                                                                                                     #
 	#          SCRIPT PARA AGILIZAR PROCESSOS DE ATUALIZAÇÕES E INSTALAÇÕES NO DEBIAN 8 JESSIE            #
 	#					                           												          #
 	#                   DESENVOLVIDO POR Kelvin Ferraz (kelvinferrazsilva@gmail.com)                      #
-	#							        Edit: 27 - ABR - 2017										      #
+	#							        Edit: 02 - MAI - 2017										      #
 	#                  												 								      #
 	#######################################################################################################
 	#																								      #
@@ -43,15 +42,42 @@
 	#   																								  #
 	#######################################################################################################
 
-#fullscreen-terminal
-#printf '\e[8;600;800t'
+
+
+#Full-Screen Option
+StartFullScreen(){
+echo "Deseja executar em fullscreen?"
+echo "Entre com a opcao [S-N]" 
+read opcaofullscreen
+
+
+	if [ "$opcaofullscreen" = "s" ] || [ "$opcaofullscreen" = "S" ]; then
+														 
+		fullscreen-terminal
+		printf '\e[8;600;800t'
+		
+		CheckisROOT
+
+
+	elif [ "$opcaofullscreen" = "n" ] || [ "$opcaofullscreen" = "N" ]; then
+		
+		CheckisROOT			
+	else
+	
+		clear 
+		echo "Opcao Invalida! Digite S ou N"
+		StartFullScreen
+	
+	fi 
+}
+
 
 
 #Create file log
 LOGFILE="/var/log/${0##*/}".log
-# Habilita log copiando a saída padrão para o arquivo LOGFILE
+# Enables logging by copying the default output to the LOGFILE file
 exec 1> >(tee -a "$LOGFILE")
-# faz o mesmo para a saída de ERROS
+# Does the same for ERROR output
 exec 2>&1
 
 #Check if its root
@@ -142,10 +168,27 @@ Begin(){
 		#deb http://ftp.br.debian.org/debian/ jessie-backports main contrib non-free" > /etc/apt/sources.list
 
 
-		#Update Repository
-		debconf-apt-progress -- apt-get update
+		##Update Repository
+		#debconf-apt-progress -- apt-get update
+		#debconf-apt-progress -- apt-get install debian-keyring  -y
 
-		#Variable receives packet
+
+		##Repository Java		
+		#echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+		#echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+		#apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+
+		
+		##Fix package in pub multimedia key
+		#gpg --keyring /usr/share/keyrings/debian-keyring.gpg -a --export 5C808C2B65558117 | apt-key add -
+
+		
+		##Update Repository
+		#debconf-apt-progress -- apt-get update
+		#debconf-apt-progress -- apt-get upgrade -y
+		
+		
+		#Variable receives packet (Dependencies needed to run the script)
 		packet=$( dpkg --get-selections | grep dialog )
 
 		if [ -n "$packet" ]; then
@@ -179,7 +222,7 @@ Begin(){
 			else
 
 				clear
-				echo " Pacote necessário: dialog  "
+				echo " Pacote necessário: O script depende: dialog  "
 				exit
 			fi
 
@@ -197,93 +240,235 @@ InstallingPrograms(){
 		2 'Plug-ins'           \
 		3 'Programas Design'   \
 		4 'Audio e video'      \
-		5 'Sair')
+		5 'Programas Internet' \
+		6 'Sair')
 
 		case $Option in
 			1) ProgramsDevops ;;
 			2) Plugins ;;
 			3) ProgramsDesign ;;
 			4) Backup ;;
-			5) exit ;;
+			5) ProgramsInternet ;;
+			6) exit ;;
 		esac
 }
 
 #Packet of DevOps
 ProgramsDevops(){
 
-	  Option=$(dialog --backtitle 'Viva o Linux | Programs for Debian' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
+	  Option=$(dialog --backtitle 'Viva o Linux | Packet for Development' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
 		Atom		 'IDE HTML,PYTHON, CSS'     on\
 		Bluefish     'IDE HTML & CSS'          off\
 		Codeblocks   'IDE C,C++,Assembly'  	   off\
-		Geany        'IDE Completa'            off\
+		Eclipse		 'IDE Java,C,C++,HTML'     off\
+		Geany        'IDE Bash,C,'            off\
         Sublime-text 'IDE PHP,CSS,HTML (V3.1)' off)
 
-	#To convert lowercase to uppercase
-	OptionDev=$(echo "$Option" | tr 'A-Z' 'a-z')
 
-
-	#Sublime-Text Installation
-	if echo "$OptionDev" | egrep 'sublime-text' > /dev/null ; then
-
-		#32 or 64 bit?
-		arq=$( file /bin/bash | cut -d' ' -f3 )
-
-		#condiction 32 or 64 bit
-	     if [ $arq = '64-bit' ]; then
-		     cd /tmp/
-		     rm -rf /tmp/*.deb
-		     rm -rf /tmp/*.deb.*
-
-		     SublimeText64="https://download.sublimetext.com/sublime-text_build-3126_amd64.deb"
-		     wget "$SublimeText64" 2>&1 | \
-			 stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
-			 dialog --backtitle 'Downloda do Sublime Text V3.126' --gauge "Download Sublime-Text 64-Bit" 0 50
-
-		     #Installation packege
-		     clear
-		     dpkg -i sublime-text_build-3126_amd64.deb
-		     apt-get install -f
-
-	     elif [ $arq = '32-bit' ]; then
-		     cd /tmp/
-		     rm -rf /tmp/*.deb
-		     rm -rf /tmp/*.deb.*
-
-		     SublimeText32="https://download.sublimetext.com/sublime-text_build-3126_i386.deb"
-		     wget "$SublimeText32" 2>&1 | \
-			 stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
-			 dialog --backtitle 'Downloda do Sublime Text V3.126' --gauge "Download Sublime-Text 32-Bit" 0 50
-
-		     #Installation packege                     br
-		     clear
-		     dpkg -i sublime-text_build-3126_i386.deb
-		     apt-get install -f
-	     fi
-
-	else
-
-	    sleep 0.01
-
+	#case cancel button is selected back to Programs Menu
+	if [ $? -eq 1 ]; then
+	
+		InstallingPrograms
+	
 	fi
-
-
-	#condiction if variable is a NULL
+	
+	#To convert lowercase to uppercase
+	OptionDev=$(echo "$Option" | tr 'A-Z' 'a-z')	
+	
+	#Sublime-Text Installation
+	packetsublime=$( dpkg --get-selections | grep sublime-text )	
+	
+	#Atom Installation
+	packetatom=$( which -a atom )
+	
+	
+	
 	if [[ -z $OptionDev ]]; then
 
-		InstallingPrograms
+		InstallingPrograms	
 
 	else
+	
+		#Instalation Atom
+		if echo "$OptionDev" | egrep 'atom' > /dev/null ; then
+		
+			if [ -n "$packetatom" ]; then
 
+				dialog --backtitle 'Instalacao do Atom'\
+				   --title "AVISO"\
+				   --msgbox "O Sistema já possui o Atom"  10 23 \
+	   
+				
+			else		
+			
+		
+				 cd /tmp/
+				 rm -rf /tmp/*.deb
+				 rm -rf /tmp/*.deb.*
+
+				 Atom="https://atom.io/download/deb"
+				 wget "$Atom" 2>&1 | \
+				 stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+				 dialog --backtitle 'Atom' --gauge "Download Atom" 0 50
+
+				 #Installation packege
+				 clear
+				 debconf-apt-progress -- apt-get install git -y
+				 dpkg -i deb				  
+				 apt-get install -f 
+				
+			fi
+		fi
+		
+			if echo "$OptionDev" | egrep 'sublime-text' > /dev/null ; then	
+				
+				if [ -n "$packetsublime" ]; then
+					
+						dialog --backtitle 'Instalacao do Sublime-Text 3.1'\
+							   --title "AVISO"\
+							   --msgbox "O Sistema já possui o Sublime-Text"  10 23 \
+						   
+				else
+		
+				
+					arq=$( file /bin/bash | cut -d' ' -f3 )
+
+					#condiction 32 or 64 bit
+					if [ $arq = '64-bit' ]; then
+						 cd /tmp/
+						 rm -rf /tmp/*.deb
+						 rm -rf /tmp/*.deb.*
+
+						 SublimeText64="https://download.sublimetext.com/sublime-text_build-3126_amd64.deb"
+						 wget "$SublimeText64" 2>&1 | \
+						 stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+						 dialog --backtitle 'Downloda do Sublime Text V3.126' --gauge "Download Sublime-Text 64-Bit" 0 50
+
+						 #Installation packege
+						 clear
+						 dpkg -i sublime-text_build-3126_amd64.deb
+						 apt-get install -f
+
+					elif [ $arq = '32-bit' ]; then
+						 cd /tmp/
+						 rm -rf /tmp/*.deb
+						 rm -rf /tmp/*.deb.*
+
+						 SublimeText32="https://download.sublimetext.com/sublime-text_build-3126_i386.deb"
+						 wget "$SublimeText32" 2>&1 | \
+						 stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+						 dialog --backtitle 'Downloda do Sublime Text V3.126' --gauge "Download Sublime-Text 32-Bit" 0 50
+
+						 #Installation packege
+						 clear
+						 dpkg -i sublime-text_build-3126_i386.deb
+						 apt-get install -f
+					fi
+											
+				fi
+			fi
+			
 		#Installation of the chosen packages
 		debconf-apt-progress -- apt-get install $OptionDev -y
 
-		InstallingPrograms
+		dialog --backtitle 'Instalacao de pacotes'\
+			   --title "AVISO"\
+		       --msgbox "Os pacotes: $OptionDev  foram instalados!"  10 30 \
 
+		InstallingPrograms
+	
+	fi
+
+	
+	
+	
+
+}
+
+#Packet of Plugins
+Plugins(){
+	Option=$(dialog --backtitle 'Viva o Linux | Plugins' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
+		Msttcorefonts 			'Fontes MS'        				 		 on\
+		Oracle-java8-installer  'Java 8'  	       				   		off\
+		Multimedia	 			'Principais plugins de audio e video'   off)
+	
+	#case cancel button is selected back to Programs Menu
+	if [ $? -eq 1 ]; then
+	
+		InstallingPrograms
+	
+	fi
+
+	#To convert lowercase to uppercase
+	OptionPlugin=$(echo "$Option" | tr 'A-Z' 'a-z')
+
+	if [[ -z $OptionPlugin ]]; then
+
+		InstallingPrograms	
+
+	else
+	
+		#Instalation Multimedia
+		if echo "$OptionPlugin" | egrep 'multimedia' > /dev/null ; then
+	
+			sleep 0.1
+
+		else
+
+			debconf-apt-progress -- apt-get install gstreamer0.10-fluendo-mp3 gstreamer0.10-plugins-really-bad ffmpeg sox twolame vorbis-tools lame faad -y
+			debconf-apt-progress -- apt-get install gstreamer0.10-plugins-bad -y
+			
+		fi
+			
+
+		
+			#Installation of the chosen packages
+			debconf-apt-progress -- apt-get install $OptionPlugin -y
+
+			dialog --backtitle 'Instalacao de pacotes'\
+				   --title "AVISO"\
+				   --msgbox "Os pacotes: $OptionPlugin foram instalados!"  10 30 \
+
+			InstallingPrograms	
 	fi
 
 
 
 }
 
+#Packet of Desing Application
+ProgramsDesing(){
 
-CheckisROOT
+Option=$(dialog --backtitle 'Viva o Linux | Design' --stdout --checklist 'Escolha sua IDE:' 0 0 0 \
+		Blender	'Modelador 3D' 	            on\
+		Gimp    'Editor de Imagem'         off\
+		Inkscape 'Vetorização de Imagem'   off)
+	
+	#case cancel button is selected back to Programs Menu
+	if [ $? -eq 1 ]; then
+	
+		InstallingPrograms
+	
+	fi
+
+	#To convert lowercase to uppercase
+	OptionDesing=$(echo "$Option" | tr 'A-Z' 'a-z')
+	
+	
+	if [[ -z $OptionPlugin ]]; then
+
+		InstallingPrograms	
+
+	else
+	
+		debconf-apt-progress -- apt-get install $OptionDesign -y
+		
+		
+		
+	fi
+
+
+}
+
+
+StartFullScreen
